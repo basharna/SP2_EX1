@@ -24,6 +24,21 @@ TEST_CASE("isConnected")
         CHECK(Algorithms::isConnected(g) == true);
     }
 
+    SUBCASE("Connected Directed Graph")
+    {
+        // Connected graph
+        std::vector<std::vector<int>> adjacencyMatrix = {
+            {0, 0, 0, 5, 0},
+            {0, 0, 0, 0, 0},
+            {0, 5, 0, 0, 0},
+            {0, 0, -9, 0, 5},
+            {0, 0, 0, 0, 0}};
+        Graph g;
+        g.loadGraph(adjacencyMatrix);
+
+        CHECK(Algorithms::isConnected(g) == true);
+    }
+
     SUBCASE("Disconnected Graph")
     {
         // Disconnected graph
@@ -35,6 +50,18 @@ TEST_CASE("isConnected")
         Graph g;
         g.loadGraph(adjacencyMatrix);
 
+        CHECK(Algorithms::isConnected(g) == false);
+    }
+    SUBCASE("Disconnected Directed Graph")
+    {
+        std::vector<std::vector<int>> adjacencyMatrix = {
+            {0, 0, 0, 5, 0},
+            {0, 0, 0, 0, 0},
+            {0, 5, 0, 0, 0},
+            {0, 0, 0, 0, 5},
+            {0, 0, 0, 0, 0}};
+        Graph g;
+        g.loadGraph(adjacencyMatrix);
         CHECK(Algorithms::isConnected(g) == false);
     }
 }

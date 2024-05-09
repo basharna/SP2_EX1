@@ -47,7 +47,7 @@ bool Algorithms::isConnected(Graph &g)
 
 vector<int> Algorithms::shortestPath(Graph &g, int start, int end)
 {
-    if(start == end)
+    if (start == end)
     {
         cout << "0" << endl;
         return {}; // Start and end are the same, return "0"
@@ -229,33 +229,34 @@ vector<int> Algorithms::isContainsCycle(Graph &g)
 pair<vector<int>, vector<int>> Algorithms::isBipartite(Graph &g)
 {
     vector<int> colors(g.getNumVertices(), -1);
-
-    colors[0] = 1;
     queue<int> q;
-    q.push(0);
 
-    while (!q.empty())
+    for (int u = 0; u < g.getNumVertices(); ++u)
     {
-        int u = q.front();
-        q.pop();
-
-        if (g.getAdjacencyMatrix()[u][u])
+        if (colors[u] != -1)
         {
-            cout << "0" << endl;
-            return {{},{}}; // Not bipartite
+            continue;
         }
+        colors[u] = 1;
+        q.push(u);
 
-        for (int v = 0; v < g.getNumVertices(); ++v)
+        while (!q.empty())
         {
-            if (g.getAdjacencyMatrix()[u][v] && colors[v] == -1)
+            int u = q.front();
+            q.pop();
+
+            for (int v = 0; v < g.getNumVertices(); ++v)
             {
-                colors[v] = 1 - colors[u];
-                q.push(v);
-            }
-            else if (g.getAdjacencyMatrix()[u][v] && colors[v] == colors[u])
-            {
-                cout << "0" << endl;
-                return {{},{}}; // Not bipartite
+                if (g.getAdjacencyMatrix()[u][v] && colors[v] == -1)
+                {
+                    colors[v] = 1 - colors[u];
+                    q.push(v);
+                }
+                else if (g.getAdjacencyMatrix()[u][v] && colors[v] == colors[u])
+                {
+                    cout << "0" << endl;
+                    return {{}, {}}; // Not bipartite
+                }
             }
         }
     }
