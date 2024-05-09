@@ -1,5 +1,5 @@
 /*
-ID: 212487144
+ID: 7144
 Email: nbashar4@gmail.com
 */
 
@@ -10,11 +10,12 @@ Email: nbashar4@gmail.com
 #include <stack>
 #include <limits>
 #include <algorithm>
+using namespace std;
 
-int Algorithms::isConnected(Graph &g)
+bool Algorithms::isConnected(Graph &g)
 {
-    std::vector<bool> visited(g.getNumVertices(), false);
-    std::queue<int> q;
+    vector<bool> visited(g.getNumVertices(), false);
+    queue<int> q;
     q.push(0);
     visited[0] = true;
 
@@ -35,17 +36,26 @@ int Algorithms::isConnected(Graph &g)
     for (bool v : visited)
     {
         if (!v)
-            return 0; // If any vertex is not visited, graph is not connected
+        {
+            cout << "0" << endl;
+            return false; // If any vertex is not visited, graph is not connected
+        }
     }
-    return 1;
+    cout << "1" << endl;
+    return true; // All vertices are visited, graph is connected
 }
 
-std::vector<int> Algorithms::shortestPath(Graph &g, int start, int end)
+vector<int> Algorithms::shortestPath(Graph &g, int start, int end)
 {
-    std::vector<int> dist(g.getNumVertices(), std::numeric_limits<int>::max());
-    std::vector<int> prev(g.getNumVertices(), -1);
+    if(start == end)
+    {
+        cout << "0" << endl;
+        return {}; // Start and end are the same, return "0"
+    }
+    vector<int> dist(g.getNumVertices(), numeric_limits<int>::max());
+    vector<int> prev(g.getNumVertices(), -1);
     dist[start] = 0;
-    std::queue<int> q;
+    queue<int> q;
     q.push(start);
 
     while (!q.empty())
@@ -66,30 +76,51 @@ std::vector<int> Algorithms::shortestPath(Graph &g, int start, int end)
         }
     }
 
-    if (dist[end] == std::numeric_limits<int>::max())
+    if (dist[end] == numeric_limits<int>::max())
     {
-        return {-1}; // No path found, return -1
+        cout << "-1" << endl;
+        return {}; // No path found, return "-1"
     }
 
-    std::vector<int> path;
+    // print path
+    vector<int> path;
     for (int at = end; at != -1; at = prev[at])
     {
-        path.insert(path.begin(), at);
+        path.push_back(at);
     }
-
+    reverse(path.begin(), path.end());
+    for (size_t i = 0; i < path.size(); ++i)
+    {
+        cout << path[i];
+        if (i != path.size() - 1)
+        {
+            cout << "->";
+        }
+    }
+    cout << endl;
     return path;
 }
 
-bool isDirectedCycleUtil(Graph& g, int v, std::vector<bool>& visited, std::vector<bool>& recStack) {
+bool isDirectedCycleUtil(Graph &g, int v, vector<bool> &visited, vector<bool> &recStack, vector<int> &cycle)
+{
     visited[v] = true;
     recStack[v] = true;
 
-    for (int u = 0; u < g.getNumVertices(); ++u) {
-        if (g.getAdjacencyMatrix()[v][u]) {
-            if (!visited[u]) {
-                if (isDirectedCycleUtil(g, u, visited, recStack))
+    for (int u = 0; u < g.getNumVertices(); ++u)
+    {
+        if (g.getAdjacencyMatrix()[v][u])
+        {
+            if (!visited[u])
+            {
+                if (isDirectedCycleUtil(g, u, visited, recStack, cycle))
+                {
+                    cycle.push_back(u);
                     return true;
-            } else if (recStack[u]) {
+                }
+            }
+            else if (recStack[u])
+            {
+                cycle.push_back(u);
                 return true; // Cycle detected
             }
         }
@@ -99,29 +130,54 @@ bool isDirectedCycleUtil(Graph& g, int v, std::vector<bool>& visited, std::vecto
     return false;
 }
 
-bool isDirectedCycle(Graph& g) {
-    std::vector<bool> visited(g.getNumVertices(), false);
-    std::vector<bool> recStack(g.getNumVertices(), false);
+vector<int> isDirectedCycle(Graph &g)
+{
+    vector<bool> visited(g.getNumVertices(), false);
+    vector<bool> recStack(g.getNumVertices(), false);
+    vector<int> cycle;
 
-    for (int v = 0; v < g.getNumVertices(); ++v) {
-        if (!visited[v]) {
-            if (isDirectedCycleUtil(g, v, visited, recStack))
-                return true;
+    for (int v = 0; v < g.getNumVertices(); ++v)
+    {
+        if (!visited[v])
+        {
+            if (isDirectedCycleUtil(g, v, visited, recStack, cycle))
+            {
+                cycle.push_back(v);
+                // Print the cycle
+                cout << "The cycle is: " << cycle.back();
+                for (int i = cycle.size() - 2; i >= 0; --i)
+                {
+                    cout << "->" << cycle[i];
+                }
+                cout << endl;
+                reverse(cycle.begin(), cycle.end());
+                return cycle;
+            }
         }
     }
-
-    return false; // No cycle found
+    cout << "0" << endl;
+    return {};
 }
 
-bool isUndirectedCycleUtil(Graph& g, int v, int parent, std::vector<bool>& visited) {
+bool isUndirectedCycleUtil(Graph &g, int v, int parent, vector<bool> &visited, vector<int> &cycle)
+{
     visited[v] = true;
 
-    for (int u = 0; u < g.getNumVertices(); ++u) {
-        if (g.getAdjacencyMatrix()[v][u]) {
-            if (!visited[u]) {
-                if (isUndirectedCycleUtil(g, u, v, visited))
+    for (int u = 0; u < g.getNumVertices(); ++u)
+    {
+        if (g.getAdjacencyMatrix()[v][u])
+        {
+            if (!visited[u])
+            {
+                if (isUndirectedCycleUtil(g, u, v, visited, cycle))
+                {
+                    cycle.push_back(u);
                     return true;
-            } else if (u != parent) {
+                }
+            }
+            else if (u != parent)
+            {
+                cycle.push_back(u);
                 return true; // Cycle detected
             }
         }
@@ -130,34 +186,52 @@ bool isUndirectedCycleUtil(Graph& g, int v, int parent, std::vector<bool>& visit
     return false;
 }
 
-bool isUndirectedCycle(Graph& g) {
-    std::vector<bool> visited(g.getNumVertices(), false);
+vector<int> isUndirectedCycle(Graph &g)
+{
+    vector<bool> visited(g.getNumVertices(), false);
+    vector<int> cycle;
 
-    for (int v = 0; v < g.getNumVertices(); ++v) {
-        if (!visited[v]) {
-            if (isUndirectedCycleUtil(g, v, -1, visited))
-                return true;
+    for (int v = 0; v < g.getNumVertices(); ++v)
+    {
+        if (!visited[v])
+        {
+            if (isUndirectedCycleUtil(g, v, -1, visited, cycle))
+            {
+                cycle.push_back(v);
+                // Print the cycle
+                cout << "The cycle is: " << cycle.back();
+                for (int i = cycle.size() - 2; i >= 0; --i)
+                {
+                    cout << "->" << cycle[i];
+                }
+                cout << endl;
+                reverse(cycle.begin(), cycle.end());
+                return cycle;
+            }
         }
     }
-
-    return false; // No cycle found
+    cout << "0" << endl;
+    return {};
 }
 
-
-bool Algorithms::isContainsCycle(Graph& g) {
-    if (g.getIsDirected()) {
+vector<int> Algorithms::isContainsCycle(Graph &g)
+{
+    if (g.getIsDirected())
+    {
         return isDirectedCycle(g);
-    } else {
+    }
+    else
+    {
         return isUndirectedCycle(g);
     }
 }
 
-bool Algorithms::isBipartite(Graph &g)
+pair<vector<int>, vector<int>> Algorithms::isBipartite(Graph &g)
 {
-    std::vector<int> colors(g.getNumVertices(), -1);
+    vector<int> colors(g.getNumVertices(), -1);
 
     colors[0] = 1;
-    std::queue<int> q;
+    queue<int> q;
     q.push(0);
 
     while (!q.empty())
@@ -167,7 +241,8 @@ bool Algorithms::isBipartite(Graph &g)
 
         if (g.getAdjacencyMatrix()[u][u])
         {
-            return false;
+            cout << "0" << endl;
+            return {{},{}}; // Not bipartite
         }
 
         for (int v = 0; v < g.getNumVertices(); ++v)
@@ -179,17 +254,55 @@ bool Algorithms::isBipartite(Graph &g)
             }
             else if (g.getAdjacencyMatrix()[u][v] && colors[v] == colors[u])
             {
-                return false;
+                cout << "0" << endl;
+                return {{},{}}; // Not bipartite
             }
         }
     }
 
-    return true;
+    // Store the bipartite sets
+    vector<int> setA, setB;
+    for (int i = 0; i < g.getNumVertices(); ++i)
+    {
+        if (colors[i] == 1)
+        {
+            setA.push_back(i);
+        }
+        else if (colors[i] == 0)
+        {
+            setB.push_back(i);
+        }
+    }
+
+    // Print the sets
+    cout << "The graph is bipartite: ";
+    cout << "A={";
+    for (size_t i = 0; i < setA.size(); ++i)
+    {
+        cout << setA[i];
+        if (i != setA.size() - 1)
+        {
+            cout << ",";
+        }
+    }
+    cout << "}, B={";
+    for (size_t i = 0; i < setB.size(); ++i)
+    {
+        cout << setB[i];
+        if (i != setB.size() - 1)
+        {
+            cout << ",";
+        }
+    }
+    cout << "}" << endl;
+
+    return {setA, setB};
 }
 
-bool Algorithms::negativeCycle(Graph &g)
+vector<int> Algorithms::negativeCycle(Graph &g)
 {
-    std::vector<int> dist(g.getNumVertices(), std::numeric_limits<int>::max());
+    vector<int> dist(g.getNumVertices(), numeric_limits<int>::max());
+    vector<int> prev(g.getNumVertices(), -1); // Add the prev vector
 
     // Initialize the distance of the source vertex to 0
     dist[0] = 0;
@@ -204,6 +317,7 @@ bool Algorithms::negativeCycle(Graph &g)
                 if (g.getAdjacencyMatrix()[u][v] != 0 && dist[u] + g.getAdjacencyMatrix()[u][v] < dist[v])
                 {
                     dist[v] = dist[u] + g.getAdjacencyMatrix()[u][v];
+                    prev[v] = u; // Update the prev vector
                 }
             }
         }
@@ -216,10 +330,22 @@ bool Algorithms::negativeCycle(Graph &g)
         {
             if (g.getAdjacencyMatrix()[u][v] != 0 && dist[u] + g.getAdjacencyMatrix()[u][v] < dist[v])
             {
-                return true; // Negative cycle found
+                vector<int> cycle;
+                int start = v;
+                while (true)
+                {
+                    cycle.push_back(start);
+                    start = prev[start];
+                    if (start == v)
+                    {
+                        break;
+                    }
+                }
+                reverse(cycle.begin(), cycle.end());
+                return cycle; // Negative cycle found
             }
         }
     }
 
-    return false; // No negative cycle found
+    return {}; // No negative cycle found
 }
