@@ -343,6 +343,15 @@ vector<int> Algorithms::negativeCycle(Graph &g)
                     }
                 }
                 reverse(cycle.begin(), cycle.end());
+                for (size_t i = 0; i < cycle.size(); ++i)
+                {
+                    cout << cycle[i];
+                    if (i != cycle.size() - 1)
+                    {
+                        cout << "->";
+                    }
+                }
+                cout << endl;
                 return cycle; // Negative cycle found
             }
         }

@@ -100,6 +100,21 @@ TEST_CASE("shortestPath")
         CHECK(Algorithms::shortestPath(g, 0, 0).empty());
         CHECK(Algorithms::shortestPath(gWeighted, 3, 0).empty());
     }
+
+    SUBCASE("Shortest Path with Negative Weights")
+    {
+        // Graph with negative weights
+        std::vector<std::vector<int>> adjacencyMatrixNegative = {
+            {0, 1, 0, 7},
+            {0, 0, -2, 0},
+            {0, 0, 0, 1},
+            {0, 0, 0, 0}};
+        Graph gNegative;
+        gNegative.loadGraph(adjacencyMatrixNegative);
+
+        std::vector<int> expectedPathNegative = {0, 1, 2, 3};
+        CHECK(Algorithms::shortestPath(gNegative, 0, 3) == expectedPathNegative);
+    }
 }
 
 TEST_CASE("isContainsCycle")
